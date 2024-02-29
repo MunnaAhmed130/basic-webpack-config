@@ -18,6 +18,6 @@ To visualize bundles run -
 npm run stats
 ```
 
-For revising this project look up vidoes swashbuckling with code.
+For revising this project look up vidoes from swashbuckling with code.
 
 This project is for me to understand webpack, loaders, plugins etc.
