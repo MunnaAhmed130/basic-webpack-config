@@ -2,14 +2,21 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 require("dotenv").config();
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+
 const BundleAnalyzerPlugin =
   require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 
 const mode =
   process.env.NODE_ENV === "production" ? "production" : "development";
 
+const devMode = mode === "development";
+
 module.exports = {
   entry: "./src/index.js",
+
+  // mode: "development",
+  mode: mode,
 
   // // code splitting
   // entry: {
@@ -24,13 +31,14 @@ module.exports = {
     },
     compress: true,
     hot: true,
+    open: true,
     port: 9000,
   },
 
-  // devtool: "source-map",
+  // devtool: false,
 
   output: {
-    filename: "bundle.js",
+    filename: devMode ? "[name].js" : "[name][contenthash].js",
     path: path.resolve(__dirname, "dist"),
     clean: true,
   },
@@ -50,22 +58,21 @@ module.exports = {
       {
         test: /\.(s[ac]|c)ss$/i,
         use: [
+          // devMode ? "style-loader" : MiniCssExtractPlugin.loader,
           MiniCssExtractPlugin.loader,
-          // Creates `style` nodes from JS strings
           // "style-loader",
-          // Translates CSS into CommonJS
           "css-loader",
           "postcss-loader",
-          // Compiles Sass to CSS
           "sass-loader",
         ],
       },
     ],
   },
 
-  // plugins: [new BundleAnalyzerPlugin()],
   plugins: [
-    new MiniCssExtractPlugin(),
+    new MiniCssExtractPlugin({
+      filename: devMode ? "[name].css" : "[name][contenthash].css",
+    }),
     new HtmlWebpackPlugin({
       template: "./src/index.html",
     }),
@@ -74,6 +81,7 @@ module.exports = {
     }),
   ],
 
-  // mode: "development",
-  mode: mode,
+  optimization: {
+    minimizer: [new CssMinimizerPlugin(), "..."],
+  },
 };
